@@ -1,0 +1,31 @@
+# ------------------------------
+# Yosys synthesis script for counter
+# Target library: tsl18fs120_scl_ss.lib
+# ------------------------------
+
+# 1. Read RTL design
+read_verilog vsdbabysoc.v
+
+# 2. Set the top module
+synth -top vsdbabysoc
+
+# 3. Read liberty file (slow corner, std cells)
+read_liberty -lib /home/vlsi/Desktop/swetha/sky130_scl_9T_0.1.1/sky130_scl_9T_LP/lib/sky130_ss_1.62_125_nldm.lib
+
+# 4. Map DFFs to library flip-flops
+dfflibmap -liberty /home/vlsi/Desktop/swetha/sky130_scl_9T_0.1.1/sky130_scl_9T_LP/lib/sky130_ss_1.62_125_nldm.lib
+# 5. Map combinational logic using ABC
+abc -liberty /home/vlsi/Desktop/swetha/sky130_scl_9T_0.1.1/sky130_scl_9T_LP/lib/sky130_ss_1.62_125_nldm.lib
+# 6. Clean up unused cells/nets
+opt_clean -purge
+
+# 7. Write out synthesized netlist
+write_verilog vsdbabysoc.v
+
+# 8. Write JSON (optional, for OpenROAD/OpenSTA)
+write_json vsdbabysoc.json
+
+# 9. Report stats
+stat
+show
+
